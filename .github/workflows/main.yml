@@ -1,0 +1,19 @@
+name: hello
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  greets:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Says hello to users
+        run: echo "Hello dosto"
+
+      - name: Say hello to username
+        env:
+          USERS: Siddharth
+        run: echo "Hello $USERS"
