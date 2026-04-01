@@ -1,0 +1,13 @@
+name: hello
+
+on:
+  push:
+    branches: [main]
+    
+jobs:
+
+ greet: 
+
+   steps:
+    - name: Say hello
+      run: echo "hello siddharth"
