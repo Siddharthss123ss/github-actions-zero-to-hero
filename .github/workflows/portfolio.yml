@@ -4,33 +4,31 @@ on:
   push:
     branches: [main]
 
-
 permissions:
   pages: write
   id-token: write
-  content: read
-
+  contents: read
 
 jobs:
-  
   deploy:
-    
-    runs-on: ubuntu:latest
+    runs-on: ubuntu-latest
 
-enviroment:
-  name: github-pages
-  url: ${{ steps.deployment.outputs.page_url }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
-  steps:
-  
-    - name: Checkout code
-      uses: action/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup github pages
-      uses: action/config-pages@v4
+      - name: Setup GitHub Pages
+        uses: actions/configure-pages@v4
 
-    - name: upload static files
-      uses: action/upload-pages-artifact@v4
+      - name: Upload static files
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: .
 
-    - name: deploy to github pages
-      uses: action/deploy-pages@v4
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
