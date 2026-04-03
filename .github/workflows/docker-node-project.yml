@@ -28,13 +28,13 @@ jobs:
         run: echo "ENV=${{ github.event.inputs.environment || 'dev' }}" >> $GITHUB_ENV
 
       - name: Login to DockerHub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN}}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
 
       - name: Build Docker Image (Dev)
         if: env.ENV == 'dev'
         run: docker build -f Dockerfile.dev -t ${{ secrets.DOCKERHUB_USER }}/devops-app:dev .
 
-      - name: Build Docker Image (Prod)
+      - name: Build Docker Image (Production)
         if: env.ENV == 'production' || github.ref == 'refs/heads/main'
         run: docker build -t ${{ secrets.DOCKERHUB_USER }}/devops-app:latest .
 
@@ -59,10 +59,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy (Dev)
+      - name: Deploy to Dev
         if: env.ENV == 'dev'
         run: echo "Deploying to Dev Server"
 
-      - name: Deploy (Production)
+      - name: Deploy to Production
         if: env.ENV == 'production'
         run: echo "Deploying to Production Server"
