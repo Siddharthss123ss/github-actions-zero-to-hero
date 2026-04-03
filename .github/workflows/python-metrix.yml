@@ -10,12 +10,9 @@ jobs:
 
     strategy:
       fail-fast: false
+      
       matrix:
-<<<<<<< HEAD
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
-=======
         python-version: ["3.9", "3.10", "3.11", "3.12"]
->>>>>>> 9400289b1d40a7c47f02cc787c722f3dcc833bfb
 
     steps:
       - name: Checkout code
@@ -28,15 +25,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-<<<<<<< HEAD
           pip install -r requirements.txt
           pip install flake8
 
       - name: Run linter
-        run: flake8 .
-=======
-          pip install flake8
-
-      - name: Run linter
         run: flake8 . || true
->>>>>>> 9400289b1d40a7c47f02cc787c722f3dcc833bfb
+
+        
