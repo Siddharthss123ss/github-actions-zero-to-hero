@@ -1,29 +1,69 @@
-name: Docker build & push
+name: Docker CI/CD Pipeline
 
 on:
   push:
     branches: [main]
 
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Select environment
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+
 jobs:
-  build-push:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
+      # ✅ Step 1: Code checkout
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # ✅ Step 2: Login to DockerHub (BEST METHOD)
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ vars.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push Docker image
+      # ✅ Step 3: Set environment
+      - name: Set Environment
+        run: echo "ENV=${{ github.event.inputs.environment || 'dev' }}" >> $GITHUB_ENV
+
+      # ✅ Step 4: Build & Push Docker Image
+      - name: Build and Push Docker Image
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
           tags: |
-            ${{ vars.DOCKERHUB_USER }}/github-actions-app:${{ github.ref_name }}
-            ${{ vars.DOCKERHUB_USER }}/github-actions-app:latest
-            ${{ vars.DOCKERHUB_USER }}/github-actions-app:${{ github.sha }}
+            ${{ vars.DOCKERHUB_USER }}/devops-app:latest
+            ${{ vars.DOCKERHUB_USER }}/devops-app:${{ github.sha }}
+            ${{ vars.DOCKERHUB_USER }}/devops-app:${{ env.ENV }}
+
+  test:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Tests
+        run: echo "Running tests..."
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Dev
+        if: ${{ env.ENV == 'dev' }}
+        run: echo "Deploying to Dev server"
+
+      - name: Deploy to Production
+        if: ${{ env.ENV == 'production' }}
+        run: echo "Deploying to Production server"
