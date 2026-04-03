@@ -1,4 +1,5 @@
 name: Portfolio
+
 on: 
   push:
     branches: [main]
@@ -10,7 +11,7 @@ permissions:
 
 jobs:
   deploy:
-    
+    runs-on: ubuntu-latest
 
     environment:
       name: github-pages
@@ -30,8 +31,4 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
-<<<<<<< HEAD
         uses: actions/deploy-pages@v4
-=======
-        uses: actions/deploy-pages@v4
->>>>>>> e7d502bab50da85102c8f1cbeb6c56b36859c468
