@@ -1,0 +1,68 @@
+name: Full CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Select environment
+        required: true
+        default: dev
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set Environment
+        run: echo "ENV=${{ github.event.inputs.environment || 'dev' }}" >> $GITHUB_ENV
+
+      - name: Login to DockerHub
+        run: echo "${{ secrets.DOCKER_TOKEN}}" | docker login -u "${{ secrets.DOCKER_USER }}" --password-stdin
+
+      - name: Build Docker Image (Dev)
+        if: env.ENV == 'dev'
+        run: docker build -f Dockerfile.dev -t ${{ secrets.DOCKER_USER }}/devops-app:dev .
+
+      - name: Build Docker Image (Prod)
+        if: env.ENV == 'production' || github.ref == 'refs/heads/main'
+        run: docker build -t ${{ secrets.DOCKER_USER }}/devops-app:latest .
+
+      - name: Push Docker Image
+        run: |
+          if [ "$ENV" = "dev" ]; then
+            docker push ${{ secrets.DOCKER_USER }}/devops-app:dev
+          else
+            docker push ${{ secrets.DOCKER_USER }}/devops-app:latest
+          fi
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Tests
+        run: echo "Running tests..."
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy (Dev)
+        if: env.ENV == 'dev'
+        run: echo "Deploying to Dev Server"
+
+      - name: Deploy (Production)
+        if: env.ENV == 'production'
+        run: echo "Deploying to Production Server"
