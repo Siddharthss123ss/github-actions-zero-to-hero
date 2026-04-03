@@ -5,22 +5,20 @@ on:
     branches: [main]
 
 jobs:
-  
   validate:
     runs-on: ubuntu-latest
 
-    
-steps: 
-  - name: checkout code
-    uses: action/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  - name: setupy python
-    uses: action/setups-python@v4
-    with:
-      python-version: "3.12"
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
 
-  - name: install dependencies
-    uses: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-  - name: run linter
-    run: flake8 app.py
+      - name: Run linter
+        run: flake8 app.py
